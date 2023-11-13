@@ -9,10 +9,10 @@ const useFoodStorage = () => {
     try {
       const currentSaveFood = await AsyncStorage.getItem(MY_FOOD_KEY);
       if (currentSaveFood !== null) {
-        const currentFoodParsed = JSON.parse(currentSaveFood);
+        const currentFoodParsed = await JSON.parse(currentSaveFood);
         currentFoodParsed.push({
-          calories,
           name,
+          calories,
           portion,
         });
         await AsyncStorage.setItem(
@@ -23,11 +23,13 @@ const useFoodStorage = () => {
       }
       await AsyncStorage.setItem(
         MY_FOOD_KEY,
-        JSON.stringify({
-          calories,
-          name,
-          portion,
-        }),
+        JSON.stringify([
+          {
+            calories,
+            name,
+            portion,
+          },
+        ]),
       );
       return Promise.resolve();
     } catch (error) {

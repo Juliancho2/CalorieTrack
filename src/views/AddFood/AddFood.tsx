@@ -1,10 +1,37 @@
 import { Button, Icon, Input } from "@rneui/themed";
-import React from "react";
-import { View, StyleSheet, Text } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, Text, Alert, ScrollView } from "react-native";
 
+import AddFoodModal from "../../components/AddFoodModal/AddFoodModal";
 import Header from "../../components/Header";
+import MealIteam from "../../components/MealIteam";
+import useFoodStorage from "../../hooks/useFoodStorage";
+import { Meal } from "../../types";
 
 const AddFood = () => {
+  const [visible, setIsVisible] = useState<boolean>(false);
+  const [foods, setFoods] = useState<Meal[]>([]);
+  const { onGetFoods } = useFoodStorage();
+
+  useEffect(() => {
+    loadFoods().catch(null);
+  }, []);
+  const loadFoods = async () => {
+    try {
+      const foodResponse = await onGetFoods();
+      setFoods(foodResponse);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleModalClose = async (shouldUpdate?: boolean) => {
+    if (shouldUpdate) {
+      Alert.alert("Food Saved successfully");
+      loadFoods();
+    }
+    setIsVisible(!visible);
+  };
   return (
     <View style={styles.container}>
       <Header />
@@ -14,6 +41,7 @@ const AddFood = () => {
         </View>
         <View style={styles.addFoodBtnContainer}>
           <Button
+            onPress={() => setIsVisible(!visible)}
             radius="lg"
             color="#4ecb71"
             icon={<Icon color="#fff" name="add-circle-outline" />}
@@ -31,6 +59,10 @@ const AddFood = () => {
           title="search"
         />
       </View>
+      <ScrollView style={styles.content}>
+        {foods?.map((food) => <MealIteam key={food.name} {...food} />)}
+      </ScrollView>
+      <AddFoodModal onClose={handleModalClose} visible={visible} />
     </View>
   );
 };
@@ -66,6 +98,7 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 14,
   },
+  content: {},
 });
 
 export default AddFood;

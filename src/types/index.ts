@@ -16,7 +16,8 @@ export type RootStackParams = {
   AddFood: undefined;
 };
 
-// export type PostImageNavigationProps = NativeStackNavigationProp<
-//   RootStackParams,
-//   "Detail"
-// >;
+export type Meal = {
+  calories: string;
+  name: string;
+  portion: string;
+};
