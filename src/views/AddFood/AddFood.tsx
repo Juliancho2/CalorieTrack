@@ -11,6 +11,7 @@ import { Meal } from "../../types";
 const AddFood = () => {
   const [visible, setIsVisible] = useState<boolean>(false);
   const [foods, setFoods] = useState<Meal[]>([]);
+  const [search, setSearch] = useState("");
   const { onGetFoods } = useFoodStorage();
 
   useEffect(() => {
@@ -22,6 +23,20 @@ const AddFood = () => {
       setFoods(foodResponse);
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleSearchPress = async () => {
+    try {
+      const result = await onGetFoods();
+      setFoods(
+        result.filter((food: Meal) =>
+          food.name.toLowerCase().includes(search.toLowerCase()),
+        ),
+      );
+    } catch (error) {
+      console.log(error);
+      setFoods([]);
     }
   };
 
@@ -50,9 +65,14 @@ const AddFood = () => {
       </View>
       <View style={styles.searchContainer}>
         <View style={styles.inputContainer}>
-          <Input placeholder="apple , pie, soda..." />
+          <Input
+            value={search}
+            onChangeText={(text: string) => setSearch(text)}
+            placeholder="apple , pie, soda..."
+          />
         </View>
         <Button
+          onPress={handleSearchPress}
           titleStyle={styles.searchBtnTitle}
           radius="lg"
           color="#ade8af"

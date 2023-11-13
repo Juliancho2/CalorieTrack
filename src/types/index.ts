@@ -1,5 +1,3 @@
-// import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
 export type PostImage = {
   copyright?: string;
   date?: string;
@@ -20,4 +18,5 @@ export type Meal = {
   calories: string;
   name: string;
   portion: string;
+  date?: string;
 };
