@@ -2,7 +2,8 @@
   "compilerOptions": {
     "types": [
       "json-schema"
-    ]
+    ],
+    "esModuleInterop": true
   },
   "extends": "expo/tsconfig.base",
   "include": [
@@ -10,5 +11,5 @@
     "**/*.tsx",
     "**/*.js",
     "**/*.jsx"
-  ]
+, "src/components/TodayMeals"  ]
 }

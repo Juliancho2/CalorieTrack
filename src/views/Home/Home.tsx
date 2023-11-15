@@ -5,14 +5,46 @@ import React, { useState, useCallback } from "react";
 import { View, Text, StyleSheet } from "react-native";
 
 import Header from "../../components/Header/Header";
+import TodayCalories, {
+  TodayCaloriesProps,
+} from "../../components/TodayCalories";
+import TodayMeals from "../../components/TodayMeals";
 import useFoodStorage from "../../hooks/useFoodStorage";
 import { Meal, RootStackParams } from "../../types";
 
+const totalCaloriesPerDay = 2000;
+
 const Home = () => {
   const [todayFood, setTodayFood] = useState<Meal[]>([]);
+  const [todayStatistics, setTodayStatistics] = useState<TodayCaloriesProps>({
+    consumed: 0,
+    percentage: 0,
+    remaining: 0,
+    total: totalCaloriesPerDay,
+  });
   const { onGetTodayFood } = useFoodStorage();
   const { navigate } =
     useNavigation<NativeStackNavigationProp<RootStackParams, "Home">>();
+
+  const calculateTodayStatistics = async (meal: Meal[]) => {
+    try {
+      const caloriesConsumed = meal.reduce(
+        (acum, curr) => acum + Number(curr.calories),
+        0,
+      );
+      const remainingCalories = totalCaloriesPerDay - caloriesConsumed;
+      const percentage = (caloriesConsumed / totalCaloriesPerDay) * 100;
+
+      setTodayStatistics({
+        consumed: caloriesConsumed,
+        percentage,
+        remaining: remainingCalories,
+        total: totalCaloriesPerDay,
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const handleAddCaloriesPress = () => {
     navigate("AddFood");
@@ -20,6 +52,7 @@ const Home = () => {
   const loadTodadyFood = useCallback(async () => {
     try {
       const todayFoodResponse = await onGetTodayFood();
+      calculateTodayStatistics(todayFoodResponse);
       setTodayFood(todayFoodResponse);
     } catch (error) {
       setTodayFood([]);
@@ -50,6 +83,11 @@ const Home = () => {
           />
         </View>
       </View>
+      <TodayCalories {...todayStatistics} />
+      <TodayMeals
+        onCompleteAddRemove={() => loadTodadyFood()}
+        foods={todayFood}
+      />
     </View>
   );
 };
